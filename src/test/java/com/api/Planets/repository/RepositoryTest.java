@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.Optional;
+
 @DataJpaTest
 public class RepositoryTest {
 
@@ -64,7 +66,52 @@ public class RepositoryTest {
 
         assertThatThrownBy(()-> planetRepository.save(planet)).isInstanceOf(RuntimeException.class);
 
+    }
 
+    @Test
+    public void getPlanet_ByExistingId_ReturnPlanet(){
+
+        PlanetDTO planetDTO = PlanetConstant.PLANET_VALID_DATE;
+        Planet newPlanet = new Planet(planetDTO);
+
+        Planet planet = entityManager.persistFlushFind(newPlanet);
+        Optional<Planet> sut = planetRepository.findById(planet.getId());
+
+        assertThat(sut).isNotEmpty();
+        assertThat(sut.get()).isEqualTo(newPlanet);
+
+    }
+
+    @Test
+    public void getPlanet_ByUnexistingId_ReturnEmpty(){
+
+        Optional<Planet> sut = planetRepository.findById(1L);
+
+        assertThat(sut).isEmpty();
+
+    }
+
+    @Test
+    public void getPlanet_ByExistingName_ReturnPlanet(){
+
+        PlanetDTO planetDTO = PlanetConstant.PLANET_VALID_DATE;
+        Planet newPlanet = new Planet(planetDTO);
+
+        Planet planet = entityManager.persistFlushFind(newPlanet);
+
+        Optional<Planet> sut = planetRepository.findPlanetByName(planet.getName());
+
+        assertThat(sut).isNotEmpty();
+        assertThat(sut.get()).isEqualTo(newPlanet);
+        
+    }
+
+    @Test
+    public void getPlanet_ByUnexistingName_ReturnEmpty(){
+
+        Optional<Planet> sut = planetRepository.findPlanetByName("Mars");
+
+        assertThat(sut).isEmpty();
 
     }
 

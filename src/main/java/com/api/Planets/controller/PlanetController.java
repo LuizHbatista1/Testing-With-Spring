@@ -44,7 +44,7 @@ public class PlanetController {
 
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<Planet>getPlanetsByName(@PathVariable("name") String name){
 
         return planetService.getPlanetByName(name).map(ResponseEntity::ok)
@@ -61,8 +61,8 @@ public class PlanetController {
 
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void>deletePlanetsById(@RequestParam ("id")Long id){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void>deletePlanetsById(@PathVariable ("id")Long id){
 
         planetService.delete(id);
         return ResponseEntity.noContent().build();
