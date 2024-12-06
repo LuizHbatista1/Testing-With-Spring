@@ -1,4 +1,4 @@
 package com.api.Planets.DTO;
 
-public record PlanetDTO(String name , String description , Float mass , String terrain , String climate) {
+public record PlanetDTO(String name , String description , Double mass , String terrain , String climate) {
 }

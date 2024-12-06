@@ -7,9 +7,12 @@ import com.api.Planets.service.PlanetServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
-import static com.api.Planets.domain.PlanetConstant.PLANET_VALID_DATE;
+
+import static com.api.Planets.domain.PlanetConstant.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,6 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.awt.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @WebMvcTest(PlanetController.class)
@@ -56,7 +61,7 @@ public class PlanetControllerTest {
     public void createPlanet_WithInvalidDate_ReturnBadRequest()throws Exception{
 
         Planet emptyPlanet = new Planet();
-        Planet invalidPlanet = new Planet("","",null,"","");
+        Planet invalidPlanet = new Planet(null,"","",null,"","");
 
         mockMvc.perform(post("/planet/create").content(objectMapper.writeValueAsString(emptyPlanet))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -129,6 +134,36 @@ public class PlanetControllerTest {
 
         mockMvc.perform(get("/planet/name/" + newPlanet.getName()))
                 .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void getPlanet_ByFilteredReturn() throws Exception{
+
+        when(planetService.listPlanetsByFilters(null , null)).thenReturn(PLANETS);
+        when(planetService.listPlanetsByFilters(MARS.getTerrain() , MARS.getClimate())).thenReturn(List.of(MARS));
+
+        mockMvc.perform(get("/planet"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$" , hasSize(3)));
+
+        mockMvc.perform(get("/planet?" + String.format("terrain=%s&climate=%s", MARS.getTerrain() , MARS.getClimate())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$" , hasSize(1)))
+                .andExpect(jsonPath("$[0]").value(MARS));
+
+    }
+
+    @Test
+    public void getPlanet_ByFilteredReturnNoPlanet() throws Exception{
+
+        when(planetService.listPlanetsByFilters(null , null)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/planet")).andExpect(status().isOk())
+                .andExpect(jsonPath("$" , hasSize(0)));
+
+
+
 
     }
 

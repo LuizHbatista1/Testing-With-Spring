@@ -22,7 +22,7 @@ public class Planet {
     private String description;
     @NotEmpty
     @Column(nullable = false)
-    private Float mass;
+    private Double mass;
     @NotEmpty
     @Column(nullable = false)
     private String terrain;
@@ -44,7 +44,8 @@ public class Planet {
 
     }
 
-    public Planet(String name, String description, Float mass , String terrain , String climate) {
+    public Planet(Long id , String name, String description, Double mass , String terrain , String climate) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.mass = mass;
@@ -80,11 +81,11 @@ public class Planet {
         this.description = description;
     }
 
-    public Float getMass() {
+    public Double getMass() {
         return mass;
     }
 
-    public void setMass(Float mass) {
+    public void setMass(Double mass) {
         this.mass = mass;
     }
 
